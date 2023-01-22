@@ -67,6 +67,7 @@ export default {
   position: relative;
   margin-top: 20px;
   width: 30%;
+  z-index: 10000;
 }
 .select-input {
   display: flex;
