@@ -213,7 +213,7 @@ export default {
 
 .mainWrapper {
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
   background-color: #f1f1f1;
   display: flex;
   align-items: center;
@@ -222,6 +222,7 @@ export default {
 
 .eventWrapper {
   width: 80%;
+  min-height: 400px;
   height: 60%;
   background-color: #fff;
   border-radius: 10px;
@@ -248,7 +249,8 @@ export default {
 
 .settingsWrapper {
   width: 80%;
-  height: 30%;
+  min-height: 500px;
+  height: 50%;
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 0 10px #333;

@@ -83,6 +83,9 @@ export default {
   display: flex;
   align-items: center;
 }
+.selected-options{
+  overflow: auto;
+}
 .select-input .selected-options .selected-option {
   margin-right: 8px;
   padding: 4px 8px;
@@ -90,7 +93,8 @@ export default {
   border-radius: 4px;
 }
 .select-input .selected-options .selected-option .fa-times {
-  margin-left: 8px;cursor: pointer;
+  margin-left: 8px;
+  cursor: pointer;
 }
 .select-input .placeholder {
   color: #ccc;
@@ -108,7 +112,6 @@ export default {
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 1;
-  overflow: hidden;
 }
 .select-dropdown ul {
   list-style: none;
