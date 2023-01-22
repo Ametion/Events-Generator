@@ -1,5 +1,5 @@
 <template>
-  <div class="countryPickerWrapper">
+  <div class="pickerWrapper">
     <select v-model="selectedOption" @change="handleChange">
       <option v-for="option in options" :key="option.value" :value="option.value">
         {{ option.label }}
@@ -18,7 +18,7 @@ export default {
   },
   data() {
     return {
-      selectedOption: [],
+      selectedOption: null,
     }
   },
   methods: {
@@ -30,12 +30,13 @@ export default {
 </script>
 
 <style scoped>
-.countryPickerWrapper{
+.pickerWrapper{
   width: 400px;
   margin-top: 35px;
+  margin-right: -100px;
 }
 
-.countryPickerWrapper select{
+.pickerWrapper select{
   width: 300px;
   height: 35px;
   border-radius: 5px;

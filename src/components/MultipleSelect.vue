@@ -66,6 +66,7 @@ export default {
 .select-container {
   position: relative;
   margin-top: 20px;
+  width: 30%;
 }
 .select-input {
   display: flex;

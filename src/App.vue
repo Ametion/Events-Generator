@@ -1,17 +1,20 @@
 <template>
   <div class="mainWrapper">
     <div class="eventWrapper">
-      <div class="event" v-if="eventDescription">
-        <h1 class="eventTitle">Event</h1>
-
+      <h1 class="eventTitle">Event</h1>
+      <div class="event" v-if="showEventError">
         <p>Event Description: {{eventDescription}}</p>
         <p>Event Date: {{eventDate}}</p>
         <p>Event Country: {{eventCountry}}</p>
       </div>
+      <h1 class="eventError" v-if="showEventError == false">There is no events with that parameters</h1>
     </div>
 
     <div class="settingsWrapper">
-      <div class="countryPickerWrapper">
+      <div class="dateError" v-if="showDatesError">
+        <h1>You must to peek a date period</h1>
+      </div>
+      <div class="pickerWrapper">
         <div class="datePicker">
           <Datepicker v-model="dateBefore" :format="chooseDateBefore"></Datepicker>
           <p>Date Before is: {{ chosenDateBefore }}</p>
@@ -48,7 +51,9 @@ export default {
     const chosenDateBefore = ref(null)
     const dateAfter = ref(null)
     const chosenDateAfter = ref(null)
-    const countryOptions = ref([])
+    const countryOptions = ref([
+      {label: "", value: -1}
+    ])
     const tagsOptions = ref([])
     const chosenCountry = ref(null)
     const chosenTags = ref([])
@@ -56,6 +61,8 @@ export default {
     const eventCountry = ref('')
     const eventDate = ref('')
     const eventTags = ref([])
+    const showDatesError = ref(false)
+    const showEventError = ref(null)
 
     const formatDate = (date) => {
       return [
@@ -71,15 +78,22 @@ export default {
 
     const chooseDateBefore = (date) => {
       chosenDateBefore.value = formatDate(date)
+      showDatesError.value = false
       return chosenDateBefore.value
     }
 
     const chooseDateAfter = (date) => {
       chosenDateAfter.value = formatDate(date)
+      showDatesError.value = false
       return chosenDateAfter.value
     }
 
     const countryHandle = (value) => {
+      if(value == -1){
+        chosenCountry.value = null
+        return
+      }
+
       chosenCountry.value = value
     }
 
@@ -103,23 +117,35 @@ export default {
       if(value.length === 0){
         chosenTags.value = []
       }
+
       value.forEach(v => {
         selectOption(v.value)
       })
     }
 
     const getEvent = async () => {
-      const event = await axios.post("http://localhost:2305/event", {
-        "countryId": chosenCountry.value == null ? 0 : chosenCountry.value,
-        "dateBefore": chosenDateBefore.value,
-        "dateAfter": chosenDateAfter.value,
-        "tags": chosenTags.value
-      })
+      try{
+        if(!dateAfter.value || !dateBefore.value){
+          showDatesError.value = true
+          return
+        }
 
-      eventDescription.value = event.data.eventDescription
-      eventCountry.value = event.data.eventCountry
-      eventDate.value = event.data.eventDate
-      eventTags.value = event.data.eventTags
+        const event = await axios.post("http://localhost:2305/event", {
+          "countryId": chosenCountry.value == null ? 0 : chosenCountry.value,
+          "dateBefore": chosenDateBefore.value,
+          "dateAfter": chosenDateAfter.value,
+          "tags": chosenTags.value
+        })
+
+        eventDescription.value = event.data.eventDescription
+        eventCountry.value = event.data.eventCountry
+        eventDate.value = event.data.eventDate
+        eventTags.value = event.data.eventTags
+
+        showEventError.value = true
+      }catch{
+        showEventError.value = false
+      }
     }
 
     onMounted(async () => {
@@ -135,8 +161,10 @@ export default {
       })
     })
     return {
-      dateBefore, chosenDateBefore, dateAfter, chosenDateAfter, countryOptions, tagsOptions, chosenCountry, chosenTags, eventDescription, eventCountry, eventDate, eventTags,
-      formatDate, padTo2Digits, chooseDateBefore, chooseDateAfter, countryHandle, selectOption, removeSelectedOption, isSelected, tagsHandle, getEvent
+      dateBefore, chosenDateBefore, dateAfter, chosenDateAfter, countryOptions, tagsOptions,
+      chosenCountry, chosenTags, eventDescription, eventCountry, eventDate, eventTags,
+      formatDate, padTo2Digits, chooseDateBefore, chooseDateAfter, countryHandle, selectOption,
+      removeSelectedOption, isSelected, tagsHandle, getEvent, showDatesError, showEventError
     }}
 }
 
@@ -160,7 +188,6 @@ export default {
   }
 }
 
-/* Keyframes for bouncing in the eventTitle */
 @keyframes bounce {
   from {
     transform: scale(0);
@@ -168,6 +195,20 @@ export default {
   to {
     transform: scale(1);
   }
+}
+
+.dateError{
+  color: red;
+  text-align: center;
+  padding: 20px;
+  position: relative;
+}
+
+.eventError{
+  text-align: center;
+  color: red;
+  margin-top: 50px;
+  padding: 20px;
 }
 
 .mainWrapper {
@@ -192,6 +233,7 @@ export default {
 .event {
   width: 100%;
   padding: 20px;
+  font-size: 40px;
 }
 
 .eventTitle {
@@ -199,24 +241,33 @@ export default {
   font-weight: bold;
   text-align: center;
   color: #333;
+  margin-top: 25px;
   margin-bottom: 20px;
   animation: bounce 0.5s ease-in-out;
 }
 
 .settingsWrapper {
   width: 80%;
-  height: 40%;
+  height: 30%;
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 0 10px #333;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-items: center;
+  justify-content: center;
   animation: fadeIn 0.5s ease-in-out 0.5s;
 }
 
-.countryPickerWrapper {
+.pickerWrapper {
   width: 100%;
+  margin-top: 50px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  justify-items: center;
   margin-bottom: 20px;
 }
 
@@ -232,7 +283,7 @@ export default {
 }
 
 mySelect, multipleSelect {
-  width: 100%;
+  width: 200%;
   padding: 20px;
 }
 
@@ -243,7 +294,7 @@ p {
 }
 
 button {
-  width: 100%;
+  width: 40%;
   padding: 10px;
   background-color: #333;
   color: #fff;
@@ -260,5 +311,15 @@ button:hover {
   background-color: #fff;
   color: #333;
   box-shadow: 0 0 10px #333;
+}
+
+@media (max-width: 900px) {
+  .mainWrapper{
+    flex-direction: column;
+  }
+
+  .eventWrapper{
+    height: 400px;
+  }
 }
 </style>
